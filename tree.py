@@ -3,21 +3,20 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from anytree import AnyNode, RenderTree, find_by_attr, PreOrderIter
-from anytree.exporter import DotExporter
+from anytree import AnyNode, PreOrderIter, RenderTree
 
 
 class stump(nn.Module):
     def __init__(self, feature_size):
         super(stump, self).__init__()
         self.feature_size = feature_size
-        self.filter = nn.Parameter(torch.randn(size=(self.feature_size, 1)).cuda())
-        self.bias = nn.Parameter(torch.randn(1).cuda())
-        self.sigmoid = nn.Sigmoid()
+        self.filter       = nn.Parameter(torch.randn(size=(self.feature_size, 1)).cuda())
+        self.bias         = nn.Parameter(torch.randn(1).cuda())
+        self.sigmoid      = nn.Sigmoid()
 
         # x dim : [batch_size, feature_size]
     def forward(self, x):
-        return self.sigmoid(torch.einsum("bf, fj -> bj",x, self.filter) + self.bias)
+        return torch.einsum("bf, fj -> bj",x, self.filter) + self.bias
 
 class leaf(nn.Module):
     def __init__(self, n_classes):
@@ -38,10 +37,10 @@ class EMA:
 
 class Mytree:
     def __init__(self, depth, feature_size, n_classes):
-        self.depth = depth
+        self.depth        = depth
         self.feature_size = feature_size
-        self.n_classes = n_classes
-        self.ema_base = 0.499/(2**(self.depth-1))
+        self.n_classes    = n_classes
+        self.ema_base     = 0.4999/(2**(self.depth-1))
 
     def grow(self):
         self.root = AnyNode(id='0',depth=0, ema = EMA(0.5+self.ema_base*2**0), prob = torch.tensor(0.5))
@@ -64,15 +63,16 @@ class Mytree:
 class softTree(nn.Module):
     def __init__(self, depth=4, n_classes=10, feature_size=784, batch_size=32):
         super(softTree, self).__init__()
-        self.depth = depth
-        self.n_classes = n_classes
+        self.depth        = depth
+        self.n_classes    = n_classes
         self.feature_size = feature_size
 
         self.tree = Mytree(depth = self.depth, feature_size = self.feature_size , n_classes = self.n_classes)
         self.tree.grow()
 
         self.stumps = nn.ModuleDict()
-        self.leafs = nn.ModuleDict()
+        self.leafs  = nn.ModuleDict()
+        self.beta   = nn.Parameter(torch.tensor(1.).cuda())
 
         innerNode = [node for node in PreOrderIter(self.tree.root, filter_=lambda node: not node.is_leaf)]
         for node in innerNode:
@@ -132,10 +132,10 @@ class softTree(nn.Module):
         return pred
 
     def predict_hard(self):
-        # leafprob, id = self.forward_prob(x)
-        leaf_id = [node.id for node in PreOrderIter(self.tree.root, filter_=lambda node: node.is_leaf)]
+        # leafprob,            id = self.forward_prob(x)
+        leaf_id             = [node.id for node in PreOrderIter(self.tree.root, filter_=lambda node: node.is_leaf)]
         output_distribution = torch.stack([self.leafs[i]() for i in leaf_id])
-        leafprob = torch.stack([self.all_node_prob[i] for i in leaf_id]).T
+        leafprob            = torch.stack([self.all_node_prob[i] for i in leaf_id]).T
 
         return output_distribution[leafprob.max(1).indices,:]
 
@@ -144,7 +144,7 @@ class softTree(nn.Module):
         if node.is_leaf:
             return 1
 
-        prob = self.stumps[node.id](x).view(-1)
+        prob = torch.sigmoid(self.beta*self.stumps[node.id](x).view(-1))
 
         self.all_node_prob[node.children[0].id] = self.all_node_prob[node.id]*(1-prob)
         self.all_node_prob[node.children[1].id] = self.all_node_prob[node.id]*prob
@@ -158,9 +158,9 @@ class softTree(nn.Module):
         noleaf = [node for node in PreOrderIter(self.tree.root, filter_=lambda node: not node.is_leaf)]
         _loss = 0
         for node in noleaf:
-            path_p = self.all_node_prob[node.id].cuda()+1e-5
-            p = self.stumps[node.id](x).view(-1)
-            alpha = (path_p*p).sum()/path_p.sum()
+            path_p    = self.all_node_prob[node.id].cuda()+1e-5
+            p         = torch.sigmoid(self.beta*self.stumps[node.id](x).view(-1))
+            alpha     = (path_p*p).sum()/path_p.sum()
             node.prob = torch.clamp(node.ema.update(alpha, node.prob.detach()),min=0,max = 1)
 
             _loss += -(0.5*torch.log(node.prob+1e-6) + 0.5*torch.log(1-node.prob+1e-6))*(0.5**node.depth)

@@ -1,6 +1,6 @@
 import torch
-import torch.optim as optim
 import torch.nn.functional as F
+import torch.optim as optim
 from einops import rearrange
 from tqdm import tqdm
 
@@ -10,19 +10,19 @@ from utils import get_mnist_dataset
 
 if __name__ == '__main__':
     # set hyperparameters
-    batch_size = 64
-    epochs = 20
-    lr = 1e-2
-    momentum = 0.9
-    temperature = 10
-    distill = True
-    regularizer_strength = 1.5
+    batch_size           = 64
+    epochs               = 50
+    lr                   = 1e-2
+    momentum             = 0.9
+    temperature          = 10
+    distill              = True
+    regularizer_strength = 1.
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     train_loader, test_loader = get_mnist_dataset(batch_size=batch_size, shuffle=True, num_workers=0)
 
     # set model
-    model = softTree(depth = 6, feature_size = 784, n_classes = 10, batch_size = batch_size).to(device)
+    model = softTree(depth = 7, feature_size = 784, n_classes = 10, batch_size = batch_size).to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
     convnet = LeNet5(10).to(device)
@@ -40,7 +40,8 @@ if __name__ == '__main__':
 
             if distill:
                 soft_target = torch.softmax(convnet(data)/temperature, dim=1)
-            onehot_target = F.one_hot(target, num_classes=10).float()
+            else:
+                soft_target = F.one_hot(target, num_classes=10).float()
             data = rearrange(data, 'b c h w -> b (c h w)')
 
             optimizer.zero_grad()
@@ -50,14 +51,14 @@ if __name__ == '__main__':
             pred = model.predict_soft()
 
             # student loss
-            loss = (-onehot_target*torch.log(pred)).sum(1).mean()
+            loss = (-soft_target*torch.log(pred)).sum(1).mean()
             loss += model.regularizer(data)*regularizer_strength
 
-            if distill:
-                #distillation loss between pred and soft_target
-                kl_div = F.kl_div(torch.log(pred), soft_target, reduction='batchmean')
-                # total loss
-                loss += kl_div
+            # if distill:
+            #     #distillation loss between pred and soft_target
+            #     kl_div = F.kl_div(torch.log(pred), soft_target, reduction='batchmean')
+            #     # total loss
+            #     loss += kl_div
             
             loss.backward()
             optimizer.step()
