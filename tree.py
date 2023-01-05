@@ -81,9 +81,10 @@ class softTree(nn.Module):
             self.leafs[node.id] = leaf(self.n_classes)
             # node.net = self.leafs[node.id]
 
-        self.all_node_prob = {'0':torch.ones(batch_size).cuda()}
-
         self.criterion = nn.NLLLoss()
+
+    def init_prob(self, batch_size):
+        self.all_node_prob = {'0':torch.ones(batch_size).cuda()}
     # def semi_forward(self, x, nets):
     #     return torch.concat([self.stumps[id](x[[i]]) for i,id in enumerate(nets)])
 
@@ -167,8 +168,8 @@ class softTree(nn.Module):
     #     return prob.prod(0)
 
 if __name__ == '__main__':
-    from torchviz import make_dot
-    from torch.autograd import Variable
+    # from torchviz import make_dot
+    # from torch.autograd import Variable
 
     net = softTree(depth = 4, feature_size = 784, n_classes = 10, batch_size = 32)
 
@@ -179,6 +180,6 @@ if __name__ == '__main__':
     net.forward_prob(x, net.tree.root)
     loss = net.cal_loss(onehot_target)
 
-    make_dot(loss, params=dict(net.named_parameters())).render("graph", format="png")
+    # make_dot(loss, params=dict(net.named_parameters())).render("graph", format="png")
     print(net.all_node_prob)
     # print(find_by_attr(test_tree.root, name='id', value='0').net(x))
