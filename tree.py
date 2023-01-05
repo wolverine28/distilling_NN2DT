@@ -41,18 +41,21 @@ class Mytree:
         self.depth = depth
         self.feature_size = feature_size
         self.n_classes = n_classes
+        self.ema_base = 0.499/(2**(self.depth-1))
 
     def grow(self):
-        self.root = AnyNode(id='0',depth=0, ema = EMA(0.5+0.05*2**0), prob = torch.tensor(0.5))
+        self.root = AnyNode(id='0',depth=0, ema = EMA(0.5+self.ema_base*2**0), prob = torch.tensor(0.5))
         for d in range(self.depth):
             for node in self.root.leaves:
                 if node.depth == d:
                     if d == self.depth-1:
-                        AnyNode(id=node.id+'0', parent=node, depth=d+1, ema = EMA(0.5+0.05*2**d), prob = torch.tensor(0.5))
-                        AnyNode(id=node.id+'1', parent=node, depth=d+1, ema = EMA(0.5+0.05*2**d), prob = torch.tensor(0.5))
+                        AnyNode(id=node.id+'0', parent=node, depth=d+1, ema = EMA(0.5+self.ema_base*2**d), prob = torch.tensor(0.5))
+                        AnyNode(id=node.id+'1', parent=node, depth=d+1, ema = EMA(0.5+self.ema_base*2**d), prob = torch.tensor(0.5))
                     else:
-                        AnyNode(id=node.id+'0', parent=node, depth=d+1, ema = EMA(0.5+0.05*2**d), prob = torch.tensor(0.5))
-                        AnyNode(id=node.id+'1', parent=node, depth=d+1, ema = EMA(0.5+0.05*2**d), prob = torch.tensor(0.5))            
+                        AnyNode(id=node.id+'0', parent=node, depth=d+1, ema = EMA(0.5+self.ema_base*2**d), prob = torch.tensor(0.5))
+                        AnyNode(id=node.id+'1', parent=node, depth=d+1, ema = EMA(0.5+self.ema_base*2**d), prob = torch.tensor(0.5))
+
+        print(f'EMA values by depth : {[0.5+self.ema_base*2**d for d in range(self.depth)]}')         
 
     def display(self):
         print(RenderTree(self.root))
