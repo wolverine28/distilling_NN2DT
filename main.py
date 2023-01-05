@@ -12,10 +12,11 @@ if __name__ == '__main__':
     # set hyperparameters
     batch_size           = 64
     epochs               = 50
-    lr                   = 1e-2
+    lr                   = 3e-4
     momentum             = 0.9
     temperature          = 10
-    distill              = True
+    # distill              = True
+    UseSoftTarget        = True
     regularizer_strength = 1.
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -38,7 +39,7 @@ if __name__ == '__main__':
             model.train()
             data, target = data.to(device), target.to(device)
 
-            if distill:
+            if UseSoftTarget:
                 soft_target = torch.softmax(convnet(data)/temperature, dim=1)
             else:
                 soft_target = F.one_hot(target, num_classes=10).float()
