@@ -158,9 +158,10 @@ class softTree(nn.Module):
             path_p = self.all_node_prob[node.id].cuda()+1e-5
             p = self.stumps[node.id](x).view(-1)
             alpha = (path_p*p).sum()/path_p.sum()
-            node.prob = node.ema.update(alpha, node.prob.detach())
+            node.prob = torch.clamp(node.ema.update(alpha, node.prob.detach()),min=0,max = 1)
 
             _loss += -(0.5*torch.log(node.prob+1e-6) + 0.5*torch.log(1-node.prob+1e-6))*(0.5**node.depth)
+
         return _loss/len(noleaf)
 
     # def pathprob(self, node, x):
