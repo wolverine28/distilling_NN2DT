@@ -1,8 +1,10 @@
 import torch
 import torch.optim as optim
+import torch.nn.functional as F
 from einops import rearrange
 from tqdm import tqdm
 
+from convnet import LeNet5
 from tree import softTree
 from utils import get_mnist_dataset
 
@@ -20,6 +22,10 @@ if __name__ == '__main__':
     model = softTree(depth = 5, feature_size = 784, n_classes = 10, batch_size = batch_size).to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
+    convnet = LeNet5(10).to(device)
+    convnet.load_state_dict(torch.load('lenet5.pth'))
+    convnet.eval()
+
     for epoch in range(epochs):
         model.train()
         train_loss = 0
@@ -28,6 +34,7 @@ if __name__ == '__main__':
         for batch_idx, (data, target) in enumerate(tq):
             model.train()
             data, target = data.to(device), target.to(device)
+            soft_target = torch.softmax(convnet(data), dim=1)
             data = rearrange(data, 'b c h w -> b (c h w)')
 
             optimizer.zero_grad()
@@ -38,7 +45,7 @@ if __name__ == '__main__':
             model.init_prob(data.shape[0])
             model.forward_prob(data, model.tree.root)
             
-            loss = model.cal_loss(target)
+            loss = model.cal_loss(soft_target)
             loss += model.regularizer(data)*1
             
             loss.backward()
@@ -66,10 +73,10 @@ if __name__ == '__main__':
 
             # output_distribution = model.forward(data)
             # leaf_prob = model.forward_prob(data)
-            # onehot_target = F.one_hot(target, num_classes=10).float()
+            onehot_target = F.one_hot(target, num_classes=10).float()
             model.init_prob(data.shape[0])
             model.forward_prob(data, model.tree.root)
-            loss = model.cal_loss(target)
+            loss = model.cal_loss(onehot_target)
             # loss += model.regularizer(data)*1
             
             test_loss += loss.item()
@@ -82,4 +89,4 @@ if __name__ == '__main__':
 
         test_loss /= len(test_loader)
         test_Acc = 100. * correct / len(test_loader.dataset)
-        print(f'Train set: Average loss: {test_loss:.4f}, Accuracy: ({test_Acc:.0f}%)')
+        print(f'Test set: Average loss: {test_loss:.4f}, Accuracy: ({test_Acc:.0f}%)')

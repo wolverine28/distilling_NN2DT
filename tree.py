@@ -81,7 +81,7 @@ class softTree(nn.Module):
             self.leafs[node.id] = leaf(self.n_classes)
             # node.net = self.leafs[node.id]
 
-        self.criterion = nn.NLLLoss()
+        # self.criterion = nn.NLLLoss()
 
     def init_prob(self, batch_size):
         self.all_node_prob = {'0':torch.ones(batch_size).cuda()}
@@ -108,10 +108,11 @@ class softTree(nn.Module):
         output_distribution = torch.stack([self.leafs[i]() for i in leaf_id])
         leafprob = torch.stack([self.all_node_prob[i] for i in leaf_id]).T
 
-        log_prob = F.log_softmax(output_distribution, dim=-1)
-        pred = torch.einsum('bl,lc->bc',leafprob,log_prob)
+        prob = F.softmax(output_distribution, dim=-1)
+        pred = torch.einsum('bl,lc->bc',leafprob,prob)
 
-        loss = self.criterion(pred, target)
+
+        loss = (-target*torch.log(pred)).sum(1).mean()
 
         return loss
     
