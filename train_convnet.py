@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
         train_loss /= len(train_loader)
         train_acc = 100. * correct / len(train_loader.dataset)
-        print(f'Train set: Average loss: {train_loss:.4f}, Accuracy: ({train_acc:.0f}%)')
+        print(f'Train set: Average loss: {train_loss:.4f}, Accuracy: ({train_acc:.3f}%)')
 
         test_loss = 0
         correct = 0
@@ -74,6 +74,6 @@ if __name__ == '__main__':
 
         test_loss /= len(test_loader)
         test_Acc = 100. * correct / len(test_loader.dataset)
-        print(f'Test set: Average loss: {test_loss:.4f}, Accuracy: ({test_Acc:.0f}%)')
+        print(f'Test set: Average loss: {test_loss:.4f}, Accuracy: ({test_Acc:.3f}%)')
 
     torch.save(model.state_dict(), 'lenet5.pth')
