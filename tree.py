@@ -102,7 +102,21 @@ class softTree(nn.Module):
 
     #     return prob
 
-    def cal_loss(self, target):
+    # def cal_loss(self, target):
+    #     leaf_id = [node.id for node in PreOrderIter(self.tree.root, filter_=lambda node: node.is_leaf)]
+
+    #     output_distribution = torch.stack([self.leafs[i]() for i in leaf_id])
+    #     leafprob = torch.stack([self.all_node_prob[i] for i in leaf_id]).T
+
+    #     prob = F.softmax(output_distribution, dim=-1)
+    #     pred = torch.einsum('bl,lc->bc',leafprob,prob)
+
+
+    #     loss = (-target*torch.log(pred)).sum(1).mean()
+
+    #     return loss
+
+    def predict_soft(self):
         leaf_id = [node.id for node in PreOrderIter(self.tree.root, filter_=lambda node: node.is_leaf)]
 
         output_distribution = torch.stack([self.leafs[i]() for i in leaf_id])
@@ -112,11 +126,9 @@ class softTree(nn.Module):
         pred = torch.einsum('bl,lc->bc',leafprob,prob)
 
 
-        loss = (-target*torch.log(pred)).sum(1).mean()
+        return pred
 
-        return loss
-    
-    def predict(self):
+    def predict_hard(self):
         # leafprob, id = self.forward_prob(x)
         leaf_id = [node.id for node in PreOrderIter(self.tree.root, filter_=lambda node: node.is_leaf)]
         output_distribution = torch.stack([self.leafs[i]() for i in leaf_id])
