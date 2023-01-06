@@ -24,7 +24,7 @@ if __name__ == '__main__':
     train_loader, test_loader = get_mnist_dataset(batch_size=batch_size, shuffle=True, num_workers=0)
 
     # set model
-    model = softTree(depth = 4, feature_size = 784, n_classes = 10, batch_size = batch_size).to(device)
+    model = softTree(depth = 6, feature_size = 784, n_classes = 10, batch_size = batch_size).to(device)
     model.load_state_dict(torch.load('softTree.pth'))
 
 
@@ -62,12 +62,12 @@ if __name__ == '__main__':
             filter = model.stumps[node.id].filter.view(-1)
             bias = model.stumps[node.id].bias.view(-1)
             if UseCorr:
-                filter = ddd*filter
+                filter = ddd.view(-1)*filter
                 rightprob = torch.sigmoid(model.beta*((ddd*filter).sum()+bias))
                 leftprob = 1-rightprob
                 prob_dict[node.id] = (leftprob.item(),rightprob.item())
-            filter = rearrange(filter,'c (h w) -> (c h) w', h=28, w=28).detach().cpu().numpy()
-            # filter = ((filter-filter.min())/(filter.max()-filter.min()))
+            filter = rearrange(filter,'(h w) -> h w', h=28, w=28)
+            filter = ((filter-filter.min())/(filter.max()-filter.min())).detach().cpu().numpy()
 
             fig = plt.figure(figsize=(10,10))
             plt.matshow(filter)

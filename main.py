@@ -23,8 +23,13 @@ if __name__ == '__main__':
     train_loader, test_loader = get_mnist_dataset(batch_size=batch_size, shuffle=True, num_workers=0)
 
     # set model
+<<<<<<< HEAD
     model = softTree(depth = 4, feature_size = 784, n_classes = 10, batch_size = batch_size).to(device)
     optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
+=======
+    model = softTree(depth = 6, feature_size = 784, n_classes = 10, batch_size = batch_size).to(device)
+    optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-3)
+>>>>>>> fe591b86af5fcea3387c76e18ed2fa82a80461d4
 
     convnet = LeNet5(10).to(device)
     convnet.load_state_dict(torch.load('lenet5.pth'))
