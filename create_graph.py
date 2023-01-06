@@ -47,4 +47,4 @@ if __name__ == '__main__':
 
     print(digraph1.source)
     digraph1.render(filename='graph_auto.dot')
-    os.system('dot -Tpng -Gsize=15,15\! .\graph_auto.dot -o tst.png')
+    os.system('dot -Tpng -Gsize=15,15\! .\graph_auto.dot -o output.png')
