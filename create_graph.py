@@ -2,6 +2,7 @@ import graphviz
 from tree import softTree
 from anytree import AnyNode, PreOrderIter, RenderTree
 import pickle
+import os
 
 
 if __name__ == '__main__':
@@ -21,11 +22,11 @@ if __name__ == '__main__':
         digraph1.node(node.children[0].id   , shape = 'box'
                                             , image = f"figures/{node.children[0].id}.png"
                                             , label = ''
-                                            , width = '5px', height='5px',imagescale='true')
+                                            , width = '0px', height='0px',imagescale='width')
         digraph1.node(node.children[1].id   , shape = 'box'
                                             , image = f"figures/{node.children[1].id}.png"
                                             , label = ''
-                                            , width = '5px', height='5px',imagescale='true')
+                                            , width = '0px', height='0px',imagescale='width')
         if len(prob_dict)!=0:
             digraph1.edge(node.id, node.children[0].id, label = f"{prob_dict[node.id][0]:.2f}",fontsize="150pt",penwidth='3')
             digraph1.edge(node.id, node.children[1].id, label = f"{prob_dict[node.id][1]:.2f}",fontsize="150pt",penwidth='3')
@@ -46,3 +47,4 @@ if __name__ == '__main__':
 
     print(digraph1.source)
     digraph1.render(filename='graph_auto.dot')
+    os.system('dot -Tpng -Gsize=15,15\! .\graph_auto.dot -o tst.png')
