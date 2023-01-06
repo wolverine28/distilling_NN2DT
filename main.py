@@ -12,7 +12,7 @@ if __name__ == '__main__':
     # set hyperparameters
     batch_size           = 64
     epochs               = 50
-    lr                   = 0.05
+    lr                   = 0.02
     momentum             = 0.9
     temperature          = 2
     # distill              = True
@@ -105,5 +105,7 @@ if __name__ == '__main__':
         test_loss /= len(test_loader)
         test_Acc = 100. * correct / len(test_loader.dataset)
         print(f'                    Test set: Average loss: {test_loss:.4f}, Accuracy: ({test_Acc:.3f}%)')
-        if epoch % 10 == 0:
+
+        if epoch % 5 == 0:
             torch.save(model.state_dict(), 'softTree.pth')
+            print('Model saved')
