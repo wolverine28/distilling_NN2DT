@@ -14,11 +14,15 @@ class LeNet5(nn.Module):
         self.fc1 = nn.Linear(16 * 4* 4, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, n_classes)
+        self.dropout = nn.Dropout(0.5)
+
 
     def forward(self, x):
         x = F.relu(self.conv1(x))
+        x = self.dropout(x)
         x = F.max_pool2d(x, 2, 2)
         x = F.relu(self.conv2(x))
+        x = self.dropout(x)
         x = F.max_pool2d(x, 2, 2)
         x = x.view(-1, 16 * 4 * 4)
         x = F.relu(self.fc1(x))

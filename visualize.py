@@ -16,10 +16,9 @@ import pickle
 if __name__ == '__main__':
     # set hyperparameters
     batch_size           = 64
-    UseCorr              = True
+    UseCorr              = False
     regularizer_strength = 1.
-
-    imshow_args = {'origin': 'upper', 'interpolation': 'None', 'cmap': 'gray'}
+    # imshow_args = {'origin': 'upper', 'interpolation': 'None', 'cmap': 'gray'}
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     train_loader, test_loader = get_mnist_dataset(batch_size=batch_size, shuffle=True, num_workers=0)
@@ -42,7 +41,7 @@ if __name__ == '__main__':
     ddd_plot = rearrange(ddd.view(-1),'(h w) -> h w', h=28, w=28)
     ddd_plot = ((ddd_plot-ddd_plot.min())/(ddd_plot.max()-ddd_plot.min())).detach().cpu().numpy()
     fig = plt.figure(figsize=(10,10))
-    plt.imshow(ddd_plot)
+    plt.matshow(ddd_plot)
     fig.tight_layout()
     plt.savefig(f'figures/data.png')
     plt.close()
@@ -67,11 +66,12 @@ if __name__ == '__main__':
                 rightprob = torch.sigmoid(model.beta*((ddd*filter).sum()+bias))
                 leftprob = 1-rightprob
                 prob_dict[node.id] = (leftprob.item(),rightprob.item())
-            filter = rearrange(filter,'c (h w) -> (c h) w', h=28, w=28)
-            filter = ((filter-filter.min())/(filter.max()-filter.min())).detach().cpu().numpy()
+            filter = rearrange(filter,'c (h w) -> (c h) w', h=28, w=28).detach().cpu().numpy()
+            # filter = ((filter-filter.min())/(filter.max()-filter.min()))
 
             fig = plt.figure(figsize=(10,10))
-            plt.imshow(filter)
+            plt.matshow(filter)
+            plt.clim(-3,3)
             fig.tight_layout()
             plt.savefig(f'figures/{node.id}.png')
             plt.close()

@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     # set model
     model = softTree(depth = 4, feature_size = 784, n_classes = 10, batch_size = batch_size).to(device)
-    optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-3)
+    optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
 
     convnet = LeNet5(10).to(device)
     convnet.load_state_dict(torch.load('lenet5.pth'))

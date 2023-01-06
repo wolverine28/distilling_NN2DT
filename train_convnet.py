@@ -10,7 +10,7 @@ from utils import get_mnist_dataset
 if __name__ == '__main__':
     # set hyperparameters
     batch_size = 64
-    epochs = 5
+    epochs = 20
     lr = 3e-4
     momentum = 0.9
     
