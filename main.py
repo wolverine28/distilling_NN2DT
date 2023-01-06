@@ -12,19 +12,19 @@ if __name__ == '__main__':
     # set hyperparameters
     batch_size           = 64
     epochs               = 50
-    lr                   = 3e-4
+    lr                   = 0.05
     momentum             = 0.9
-    temperature          = 10
+    temperature          = 2
     # distill              = True
     UseSoftTarget        = True
     regularizer_strength = 1.
-    
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     train_loader, test_loader = get_mnist_dataset(batch_size=batch_size, shuffle=True, num_workers=0)
 
     # set model
-    model = softTree(depth = 7, feature_size = 784, n_classes = 10, batch_size = batch_size).to(device)
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    model = softTree(depth = 4, feature_size = 784, n_classes = 10, batch_size = batch_size).to(device)
+    optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-3)
 
     convnet = LeNet5(10).to(device)
     convnet.load_state_dict(torch.load('lenet5.pth'))
@@ -60,7 +60,7 @@ if __name__ == '__main__':
             #     kl_div = F.kl_div(torch.log(pred), soft_target, reduction='batchmean')
             #     # total loss
             #     loss += kl_div
-            
+
             loss.backward()
             optimizer.step()
 
@@ -105,3 +105,5 @@ if __name__ == '__main__':
         test_loss /= len(test_loader)
         test_Acc = 100. * correct / len(test_loader.dataset)
         print(f'                    Test set: Average loss: {test_loss:.4f}, Accuracy: ({test_Acc:.3f}%)')
+        if epoch % 10 == 0:
+            torch.save(model.state_dict(), 'softTree.pth')
