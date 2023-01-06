@@ -6,9 +6,7 @@ import os
 
 
 if __name__ == '__main__':
-    depth = 4
-
-    model = softTree(depth = depth, feature_size = 784, n_classes = 10, batch_size = 0)
+    model = softTree(depth = 6, feature_size = 784, n_classes = 10, batch_size = 0)
 
 
     with open('prob_dict.pickle', 'rb') as handle:
@@ -47,4 +45,4 @@ if __name__ == '__main__':
 
     print(digraph1.source)
     digraph1.render(filename='graph_auto.dot')
-    os.system('dot -Tpng -Gsize=15,15\! .\graph_auto.dot -o output.png')
+    os.system('dot -Tpng -Gsize=15,15\! graph_auto.dot -o output.png')
