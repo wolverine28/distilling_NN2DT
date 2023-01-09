@@ -2,7 +2,7 @@
     "name": "ConvNet",
     "n_gpu": 1,
     "batch_size": 64,
-    "convnet_epochs": 1,
+    "convnet_epochs": 10,
     "convnet_lr": 0.0003,
     "convnet_weight_decay": 0.0001,
     "n_class": 10,

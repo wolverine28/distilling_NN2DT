@@ -13,7 +13,7 @@
     "feature_size": 784,
     "n_class": 10,
     "save_dir": "saved/",
-    "use_corr": false,
+    "use_corr": true,
     "_comment": {
         "data_loader": {
             "type": "MnistDataLoader",

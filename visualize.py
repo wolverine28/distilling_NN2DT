@@ -61,12 +61,12 @@ def main(config):
                 rightprob = torch.sigmoid(model.beta*((ddd*filter).sum()+bias))
                 leftprob = 1-rightprob
                 prob_dict[node.id] = (leftprob.item(),rightprob.item())
-            filter = rearrange(filter,'(h w) -> h w', h=28, w=28)
-            filter = ((filter-filter.min())/(filter.max()-filter.min())).detach().cpu().numpy()
+            filter = rearrange(filter,'(h w) -> h w', h=28, w=28).detach().cpu().numpy()
+            # filter = ((filter-filter.min())/(filter.max()-filter.min())).detach().cpu().numpy()
 
             fig = plt.figure(figsize=(10,10))
             plt.matshow(filter)
-            plt.clim(-3,3)
+            plt.clim(-4,4)
             fig.tight_layout()
             plt.savefig(f'figures/nodes/{node.id}.png')
             plt.close()
