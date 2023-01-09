@@ -27,8 +27,11 @@ def main(config):
                                             , label = ''
                                             , width = '10px', height='10px',imagescale='true')
         if len(prob_dict)!=0:
-            digraph1.edge(node.id, node.children[0].id, label = f"{prob_dict[node.id][0]:.2f}",fontsize="150pt",penwidth='3')
-            digraph1.edge(node.id, node.children[1].id, label = f"{prob_dict[node.id][1]:.2f}",fontsize="150pt",penwidth='3')
+            res = prob_dict[node.id][0]>prob_dict[node.id][1]
+            col1 = "green" if res else "red"
+            col2 = "red" if res else "green"
+            digraph1.edge(node.id, node.children[0].id, label = f"{prob_dict[node.id][0]:.2f}",fontsize="150pt",penwidth='7',color=col1)
+            digraph1.edge(node.id, node.children[1].id, label = f"{prob_dict[node.id][1]:.2f}",fontsize="150pt",penwidth='7',color=col2)
         else:
             digraph1.edge(node.id, node.children[0].id, label = f"",penwidth='3')
             digraph1.edge(node.id, node.children[1].id, label = f"",penwidth='3')
