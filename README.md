@@ -24,5 +24,8 @@ python create_graph.py
 ```
 The resulting graph will be saved on `figures/output.png`
 
+By changing `use_corr` in `config_SDT.json`, the content of the output figure will change either showing a correlation with sample input or just showing the model itself.
+
+
 # Results
 ![output.png](figures/output.png)
