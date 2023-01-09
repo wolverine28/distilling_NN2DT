@@ -25,4 +25,4 @@ python create_graph.py
 The resulting graph will be saved on `figures/output.png`
 
 
-![output.png]("figures\output.png")
+![output.png]("figures/output.png")
