@@ -7,9 +7,9 @@ import torch.optim as optim
 from einops import rearrange
 from tqdm import tqdm
 
-from convnet import LeNet5
+from models.convnet import LeNet5
 from parse_config import ConfigParser
-from tree import softTree
+from models.tree import softTree
 from utils import get_mnist_dataset
 
 
@@ -112,7 +112,7 @@ def main(config):
 
 if __name__ == '__main__':
 
-    args = argparse.ArgumentParser(description='PyTorch Template')
+    args = argparse.ArgumentParser(description='Distilling a Neural Network Into a Soft Decision Tree')
     args.add_argument('-c', '--config', default='config.json', type=str,
                       help='config file path (default: None)')
     args.add_argument('-r', '--resume', default=None, type=str,

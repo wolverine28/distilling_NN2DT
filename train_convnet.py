@@ -7,7 +7,7 @@ import torch.optim as optim
 from einops import rearrange
 from tqdm import tqdm
 
-from convnet import LeNet5
+from models.convnet import LeNet5
 from parse_config import ConfigParser
 from utils import get_mnist_dataset
 
@@ -81,7 +81,7 @@ def main(config):
 if __name__ == '__main__':
 
     args = argparse.ArgumentParser(description='PyTorch Template')
-    args.add_argument('-c', '--config', default='convnet_config.json', type=str,
+    args.add_argument('-c', '--config', default='config_convnet.json', type=str,
                       help='config file path (default: None)')
     args.add_argument('-r', '--resume', default=None, type=str,
                       help='path to latest checkpoint (default: None)')

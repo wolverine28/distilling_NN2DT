@@ -16,6 +16,8 @@
 
     "save_dir": "saved/",
 
+    "use_corr": true,
+
     "_comment":{
         "data_loader": {
             "type": "MnistDataLoader",

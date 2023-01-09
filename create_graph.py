@@ -1,5 +1,5 @@
 import graphviz
-from tree import softTree
+from models.tree import softTree
 from anytree import AnyNode, PreOrderIter, RenderTree
 import pickle
 import os
