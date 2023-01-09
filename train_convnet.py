@@ -1,28 +1,28 @@
+import argparse
+import collections
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from convnet import LeNet5
 from einops import rearrange
 from tqdm import tqdm
 
+from convnet import LeNet5
+from parse_config import ConfigParser
 from utils import get_mnist_dataset
 
-if __name__ == '__main__':
-    # set hyperparameters
-    batch_size = 64
-    epochs = 20
-    lr = 3e-4
-    momentum = 0.9
+
+def main(config):
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    train_loader, test_loader = get_mnist_dataset(batch_size=batch_size, shuffle=True, num_workers=0)
+    train_loader, test_loader = get_mnist_dataset(batch_size=config['batch_size'], shuffle=True, num_workers=0)
 
     # set model
-    model = LeNet5(10).to(device)
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    model = LeNet5(config['n_class']).to(device)
+    optimizer = optim.Adam(model.parameters(), lr=config['convnet_lr'], weight_decay=config['convnet_weight_decay'])
     criterion = nn.CrossEntropyLoss()
 
-    for epoch in range(epochs):
+    for epoch in range(config['convnet_epochs']):
         model.train()
         train_loss = 0
         correct = 0
@@ -76,4 +76,18 @@ if __name__ == '__main__':
         test_Acc = 100. * correct / len(test_loader.dataset)
         print(f'Test set: Average loss: {test_loss:.4f}, Accuracy: ({test_Acc:.3f}%)')
 
-    torch.save(model.state_dict(), 'lenet5.pth')
+    torch.save(model.state_dict(), config.save_dir / 'lenet5.pth')
+
+if __name__ == '__main__':
+
+    args = argparse.ArgumentParser(description='PyTorch Template')
+    args.add_argument('-c', '--config', default='convnet_config.json', type=str,
+                      help='config file path (default: None)')
+    args.add_argument('-r', '--resume', default=None, type=str,
+                      help='path to latest checkpoint (default: None)')
+    args.add_argument('-d', '--device', default='0', type=str,
+                      help='indices of GPUs to enable (default: all)')
+    
+    config = ConfigParser.from_args(args,run_id='')
+
+    main(config)

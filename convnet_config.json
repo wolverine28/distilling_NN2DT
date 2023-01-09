@@ -1,0 +1,13 @@
+{
+    "name": "ConvNet",
+    "n_gpu": 1,
+
+    "batch_size": 64,
+    "convnet_epochs": 1,
+    "convnet_lr": 3e-4,
+    "convnet_weight_decay": 1e-4,
+
+    "n_class": 10,
+
+    "save_dir": "saved/"
+}
