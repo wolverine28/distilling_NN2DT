@@ -14,18 +14,13 @@ from utils import get_mnist_dataset
 
 
 def main(config):
-    #  # set hyperparameters
-    # batch_size           = 64
-    # UseCorr              = False
-    # regularizer_strength = 1.
-    # # imshow_args = {'origin': 'upper', 'interpolation': 'None', 'cmap': 'gray'}
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     train_loader, test_loader = get_mnist_dataset(batch_size=config['batch_size'], shuffle=True, num_workers=0)
 
     # set model
-    model = softTree(depth = 6, feature_size = 784, n_classes = 10, batch_size = config['batch_size']).to(device)
-    model.load_state_dict(torch.load('softTree.pth'))
+    model = softTree(depth = config['depth'], feature_size = config['feature_size'], n_classes = config['n_class'], batch_size = config['batch_size']).to(device)
+    model.load_state_dict(torch.load(config.save_dir/'softTree.pth'))
 
 
     data, target = next(iter(train_loader))
@@ -82,7 +77,7 @@ def main(config):
 if __name__ == '__main__':
 
     args = argparse.ArgumentParser(description='Distilling a Neural Network Into a Soft Decision Tree')
-    args.add_argument('-c', '--config', default='config.json', type=str,
+    args.add_argument('-c', '--config', default='config_SDT.json', type=str,
                       help='config file path (default: None)')
     args.add_argument('-r', '--resume', default=None, type=str,
                       help='path to latest checkpoint (default: None)')

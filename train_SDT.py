@@ -26,7 +26,7 @@ def main(config):
     optimizer = optim.AdamW(model.parameters(), lr=config["lr"], weight_decay=config['weight_decay'])
 
     convnet = LeNet5(config['n_class']).to(device)
-    convnet.load_state_dict(torch.load('lenet5.pth'))
+    convnet.load_state_dict(torch.load(config['convnet_ckpt_path']))
     convnet.eval()
 
     for epoch in range(config['epochs']):
@@ -113,7 +113,7 @@ def main(config):
 if __name__ == '__main__':
 
     args = argparse.ArgumentParser(description='Distilling a Neural Network Into a Soft Decision Tree')
-    args.add_argument('-c', '--config', default='config.json', type=str,
+    args.add_argument('-c', '--config', default='config_SDT.json', type=str,
                       help='config file path (default: None)')
     args.add_argument('-r', '--resume', default=None, type=str,
                       help='path to latest checkpoint (default: None)')

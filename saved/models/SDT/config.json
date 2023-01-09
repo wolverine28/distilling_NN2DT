@@ -1,6 +1,7 @@
 {
     "name": "SDT",
     "n_gpu": 1,
+    "convnet_ckpt_path": "saved/models/ConvNet/lenet5.pth",
     "batch_size": 64,
     "epochs": 50,
     "lr": 0.02,
@@ -12,6 +13,7 @@
     "feature_size": 784,
     "n_class": 10,
     "save_dir": "saved/",
+    "use_corr": false,
     "_comment": {
         "data_loader": {
             "type": "MnistDataLoader",
