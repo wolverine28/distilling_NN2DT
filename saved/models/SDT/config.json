@@ -1,0 +1,31 @@
+{
+    "name": "SDT",
+    "n_gpu": 1,
+    "batch_size": 64,
+    "epochs": 50,
+    "lr": 0.02,
+    "temperature": 2,
+    "UseSoftTarget": true,
+    "regularizer_strength": 1.0,
+    "weight_decay": 0.0001,
+    "depth": 4,
+    "feature_size": 784,
+    "n_class": 10,
+    "save_dir": "saved/",
+    "_comment": {
+        "data_loader": {
+            "type": "MnistDataLoader",
+            "args": {
+                "data_dir": "data/",
+                "batch_size": 128,
+                "shuffle": true,
+                "validation_split": 0.1,
+                "num_workers": 2
+            }
+        },
+        "metrics": [
+            "accuracy",
+            "top_k_acc"
+        ]
+    }
+}
